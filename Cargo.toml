@@ -1,0 +1,50 @@
+[package]
+name = "eastmoneyx"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.73"
+description = "东方财富（EastMoney）宏观观测的离线源事实类型与 CSV 解析：仅脱敏宏观观测、fail-closed 授权判定与拒绝守卫"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bytechainx/eastmoneyx"
+homepage = "https://github.com/bytechainx/eastmoneyx"
+documentation = "https://github.com/bytechainx/eastmoneyx#readme"
+readme = "README.md"
+keywords = ["eastmoney", "macro", "observation", "csv", "finance"]
+categories = ["finance", "data-structures", "parser-implementations"]
+include = [
+    "src/**/*",
+    "tests/**/*",
+    "benches/**/*",
+    "examples/**/*",
+    "docs/**/*",
+    "README.md",
+    "CHANGELOG.md",
+    "CONTEXT.md",
+    "CONTRIBUTING.md",
+    "LICENSE-*",
+    "Cargo.toml",
+]
+
+[dependencies]
+csv = "1"
+thiserror = "2"
+
+[dev-dependencies]
+serde_json = "1"
+
+[[bench]]
+name = "hot_path"
+harness = false
+
+[lints.rust]
+private_interfaces = "deny"
+private_bounds = "deny"
+unused_must_use = "warn"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+unreachable = "deny"
+todo = "deny"
+unimplemented = "deny"

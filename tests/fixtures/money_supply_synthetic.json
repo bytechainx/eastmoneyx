@@ -1,0 +1,9 @@
+{
+  "_synthetic": true,
+  "_note": "本文件为特性 005 自拟的合成样本，不是真实源数据，不构成任何证据。",
+  "kind": "observation",
+  "product": "macro",
+  "series_kind": "MoneySupply",
+  "format": "csv",
+  "csv": "series,period,m0,m1,m2,m0_yoy,m1_yoy,m2_yoy,unit\nmoney_supply,2026-06,105.0,655.0,3010.5,8.8,5.9,7.9,亿元\nmoney_supply,2026-07,110.5,660.1,3050.2,9.1,6.2,8.0,亿元\nmoney_supply,2026-08,,,3060.9,,,8.1,亿元\n"
+}
