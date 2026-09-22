@@ -274,6 +274,7 @@ pub struct EastMoneyOmoOperation {
 /// # Ok::<(), eastmoneyx::EastMoneyError>(())
 /// ```
 pub fn validate_money_supply(observation: &EastMoneyMoneySupply) -> EastMoneyResult<()> {
+    observation.period.validate()?;
     if !matches!(observation.period, Period::Month { .. }) {
         return Err(EastMoneyError::Invalid(
             "货币供应量观测的业务期间必须是月度（YYYY-MM）".into(),
@@ -390,5 +391,14 @@ mod tests {
             EastMoneySeriesKind::MoneySupply,
             "顺序须与清单 §1.3 一致"
         );
+    }
+
+    #[test]
+    fn adversarial_public_month_is_revalidated() {
+        let mut observation = sample(EastMoneyValue::Present(300.5));
+        for (year, month) in [(2026, 0), (2026, 99), (999, 1)] {
+            observation.period = Period::Month { year, month };
+            assert!(validate_money_supply(&observation).is_err());
+        }
     }
 }

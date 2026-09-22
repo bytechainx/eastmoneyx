@@ -23,7 +23,7 @@
 
 use std::collections::HashSet;
 
-use csv::{ReaderBuilder, StringRecord, Trim};
+use csv::{ReaderBuilder, StringRecord};
 
 use crate::error::{EastMoneyError, EastMoneyResult};
 use crate::value::{
@@ -137,7 +137,7 @@ pub fn parse_eastmoney_interbank_rates(
     let mut seen: HashSet<(String, Period)> = HashSet::new();
     let mut out = Vec::with_capacity(rows.len());
     for (index, record) in rows.iter().enumerate() {
-        let period = Period::parse(field(record, 0)?)?;
+        let period = Period::Day(Date::parse(field(record, 0)?)?);
         let series = EastMoneyInterbankSeries::parse(field(record, 1)?)?;
         if !seen.insert((series.label().to_string(), period)) {
             return Err(duplicate_identity(index, "series + period"));
@@ -255,7 +255,6 @@ fn read_rows(input: &str, expected: &[&str]) -> EastMoneyResult<Vec<StringRecord
     let mut reader = ReaderBuilder::new()
         .has_headers(false)
         .flexible(false)
-        .trim(Trim::All)
         .from_reader(input.as_bytes());
     let mut all = Vec::new();
     for record in reader.records() {
@@ -518,5 +517,23 @@ money_supply,2026-08,1,2,3,4,5,6,parsec\n";
         assert!(guard_parse_format(EastMoneyParseFormat::Csv).is_ok());
         let error = guard_parse_format(EastMoneyParseFormat::Jsonp).expect_err("未实现");
         assert_eq!(error.kind(), crate::EastMoneyErrorKind::NotApplicable);
+    }
+
+    #[test]
+    fn adversarial_headers_and_identity_are_not_trimmed() {
+        let header = "period,series,rate,change_bp,unit\n";
+        for input in [
+            " period ,series,rate,change_bp,unit\n2026-08-15,SHIBOR_ON,1,0,%".to_owned(),
+            format!("{header}2026-08-15, SHIBOR_ON ,1,0,%"),
+        ] {
+            assert!(parse_eastmoney_interbank_rates(&input).is_err());
+        }
+    }
+    #[test]
+    fn adversarial_daily_rate_rejects_other_periods() {
+        for period in ["2026", "2026-08", "2026-Q3"] {
+            let input = format!("period,series,rate,change_bp,unit\n{period},SHIBOR_ON,1,0,%");
+            assert!(parse_eastmoney_interbank_rates(&input).is_err());
+        }
     }
 }
