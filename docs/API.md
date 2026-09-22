@@ -18,7 +18,7 @@
 | 项 | 一行语义 |
 | --- | --- |
 | `Date::new` / `Date::parse` | 严格 ISO `YYYY-MM-DD` 的日期身份（含闰年校验） |
-| `Period::parse` | `YYYY` / `YYYY-MM` / `YYYY-Qn` / `YYYY-MM-DD` 四种期间形态 |
+| `Period::parse` | `YYYY` / `YYYY-MM` / `YYYY-Qn` / `YYYY-MM-DD` 四种期间形态；年份统一为 1000–9999 |
 | `Frequency` | `Daily` / `Weekly` / `Monthly` / `Quarterly` / `Annual` / `Event` / `Irregular` |
 | `Unit` | 源侧单位（`Percent` / `BasisPoint` / `HundredMillionYuan` / `Yuan` / `Undeclared`） |
 | `EastMoneyCode::new` / `as_str` | 源侧码（非空、无控制字符、长度受限；取值域由源决定） |
@@ -37,10 +37,10 @@
 | 项 | 一行语义 |
 | --- | --- |
 | `validate_observation_scope` | 只放行 `kind=observation` + `product=macro`，其余产品路由他处 |
-| `validate_money_supply` | 校验货币供应量观测（月度、`revision` 必须为 `None`、至少一项取值） |
+| `validate_money_supply` | 校验货币供应量观测（月度及年月分量、`revision` 必须为 `None`、至少一项取值） |
 | `guard_parse_format` | 只放行 CSV；JSONP 属未来任务 → `NotApplicable` |
 | `guard_live_execution` | 七类执行通道一律拒绝（含代理轮换） |
-| `authorize_eastmoney_access` | 授权判定（fail-closed）；证据不完整 → `Denied` |
+| `authorize_eastmoney_access` | 授权判定（fail-closed）；证据不完整、日期非法、范围令牌不精确或同名键重复 → `Denied` |
 | `current_eastmoney_authorization` | 本域当前授权判定，恒为 `Denied` |
 | `EastMoneyAuthorization` / `EastMoneyAuthorizationEvidence` | 判定结果与只读证据输入 |
 | `EastMoneyExecutionChannel` | 被禁通道枚举 |

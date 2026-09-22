@@ -163,6 +163,24 @@ pub enum Period {
 }
 
 impl Period {
+    /// 复验公开期间分量，避免直接构造绕过日期范围。
+    pub(crate) fn validate(&self) -> EastMoneyResult<()> {
+        match *self {
+            Self::Day(date) | Self::Event { date } => {
+                Date::new(date.year, date.month, date.day).map(|_| ())
+            }
+            Self::Month { year, month } => Date::new(year, month, 1).map(|_| ()),
+            Self::Quarter { year, quarter } => {
+                Date::new(year, 1, 1)?;
+                if !(1..=4).contains(&quarter) {
+                    return Err(EastMoneyError::Invalid("季度须在 1–4 之间".into()));
+                }
+                Ok(())
+            }
+            Self::Year(year) => Date::new(year, 1, 1).map(|_| ()),
+        }
+    }
+
     /// 解析期间形态：`YYYY-MM-DD` → [`Period::Day`]、`YYYY-MM` → [`Period::Month`]、
     /// `YYYY-Qn` → [`Period::Quarter`]、`YYYY` → [`Period::Year`]。
     ///
@@ -171,7 +189,7 @@ impl Period {
     /// 形态不属上述四种、或字段越界时返回 [`EastMoneyError::Invalid`]。
     pub fn parse(input: &str) -> EastMoneyResult<Self> {
         let b = input.as_bytes();
-        match b.len() {
+        let period = match b.len() {
             10 => Ok(Self::Day(Date::parse(input)?)),
             7 if b[4] == b'-' && (b[5] == b'Q' || b[5] == b'q') => {
                 let year = four_digits(&b[0..4])? as i16;
@@ -193,7 +211,9 @@ impl Period {
             _ => Err(EastMoneyError::Invalid(
                 "期间须为 YYYY / YYYY-MM / YYYY-Qn / YYYY-MM-DD 之一".into(),
             )),
-        }
+        }?;
+        period.validate()?;
+        Ok(period)
     }
 }
 
@@ -467,6 +487,13 @@ mod tests {
             let error =
                 validate_observation_scope(EastMoneyKind::Observation, product).expect_err("拒绝");
             assert_eq!(error.kind(), crate::EastMoneyErrorKind::RoutedElsewhere);
+        }
+    }
+
+    #[test]
+    fn adversarial_period_year_range_is_consistent() {
+        for period in ["0000", "0999", "0000-01", "0999-Q1"] {
+            assert!(Period::parse(period).is_err(), "非法年份：{period}");
         }
     }
 }

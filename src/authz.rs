@@ -78,8 +78,18 @@ pub fn authorize_eastmoney_access(
     if scope.is_empty() {
         return denied("覆盖范围不明：证据未声明被覆盖的范围");
     }
-    if !scope.contains(REQUIRED_SCOPE_KIND) || !scope.contains(REQUIRED_SCOPE_PRODUCT) {
+    if !scope_covers(scope, REQUIRED_SCOPE_KIND) || !scope_covers(scope, REQUIRED_SCOPE_PRODUCT) {
         return denied("覆盖范围不明：证据须显式声明 kind=observation 与 product=macro");
+    }
+    if Date::new(today.year, today.month, today.day).is_err()
+        || Date::new(
+            evidence.expires_on.year,
+            evidence.expires_on.month,
+            evidence.expires_on.day,
+        )
+        .is_err()
+    {
+        return denied("授权日期非法：当前日与截止日必须是有效日历日期");
     }
     if today > evidence.expires_on {
         return denied("授权证据已过期：有效期截止日早于当前日期");
@@ -87,6 +97,24 @@ pub fn authorize_eastmoney_access(
     EastMoneyAuthorization::Authorized {
         scope: scope.to_string(),
     }
+}
+
+/// 范围按空白、分号或逗号分隔；同名键只能声明一次且值必须精确匹配。
+fn scope_covers(scope: &str, required: &str) -> bool {
+    let key = required.split('=').next().unwrap_or("");
+    let mut found = false;
+    for token in scope
+        .split(|c: char| c.is_whitespace() || c == ';' || c == ',')
+        .filter(|token| !token.is_empty())
+    {
+        if token.split('=').next() == Some(key) {
+            if found || token != required {
+                return false;
+            }
+            found = true;
+        }
+    }
+    found
 }
 
 /// 本域的**当前**授权判定。
@@ -258,5 +286,39 @@ mod tests {
                 channel.label()
             );
         }
+    }
+
+    #[test]
+    fn adversarial_scope_tokens_must_be_exact_and_unambiguous() {
+        for scope in [
+            "kind=observation_fake product=macro_fake",
+            "not_kind=observation product=macro",
+            "kind=observation product=macro kind=quote",
+            "kind=observation product=macro product=market",
+        ] {
+            let evidence = full_evidence(scope, today());
+            assert!(matches!(
+                authorize_eastmoney_access(Some(&evidence), today()),
+                EastMoneyAuthorization::Denied { .. }
+            ));
+        }
+    }
+    #[test]
+    fn adversarial_authorization_dates_are_revalidated() {
+        let bad = Date {
+            year: 2026,
+            month: 9,
+            day: 99,
+        };
+        let mut evidence = full_evidence("kind=observation product=macro", bad);
+        assert!(matches!(
+            authorize_eastmoney_access(Some(&evidence), today()),
+            EastMoneyAuthorization::Denied { .. }
+        ));
+        evidence.expires_on = Date::new(2026, 12, 31).unwrap();
+        assert!(matches!(
+            authorize_eastmoney_access(Some(&evidence), bad),
+            EastMoneyAuthorization::Denied { .. }
+        ));
     }
 }
