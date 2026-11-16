@@ -9,7 +9,7 @@
 
 ## 技术栈
 
-- Rust edition 2021，rust-version 1.73（由依赖图推导，见 `CONTEXT.md`）
+- Rust edition 2021，rust-version 1.77（由依赖图推导，见 `CONTEXT.md`）
 - 依赖：`csv` 1（CSV 解析）、`thiserror` 2（错误模型）；`serde_json` 1 仅作 dev-dependency（读合成夹具）
 - 无 path 依赖；零业务耦合，不依赖 `kernel` / `contracts` 或任何 `bytechainx/*` crate
 - crate 级 lint：`unwrap_used` / `expect_used` / `panic` / `unreachable` / `todo` / `unimplemented`
