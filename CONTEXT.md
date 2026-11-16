@@ -54,14 +54,14 @@ _Avoid_: 后写覆盖（覆盖会让「哪一条是源事实」不可判定）
 | `memchr` | 2.8.3 | 1.61 |
 | `serde` / `serde_core` | 1.0.229 | 1.56 |
 | `serde_derive` / `proc-macro2` / `quote` / `syn` | 1.0.229 / 1.0.107 / 1.0.47 / 3.0.6 | 1.71 |
-| `serde_json`（dev） | 1.0.151 | 1.71 |
+| `serde_json`（dev） | 1.0.154 | 1.71 |
 | `ryu` / `unicode-ident` / `zmij` | 1.0.23 / 1.0.26 / 1.0.23 | 1.71 |
-| `thiserror` / `thiserror-impl` | 2.0.20 | 1.71 |
+| `thiserror` / `thiserror-impl` | 2.0.21 | 1.77 |
 
-**最大值 = 1.73**，故本 crate 声明 `rust-version = "1.73"`（不得照抄兄弟仓）。
+**最大值 = 1.77**（`thiserror` / `thiserror-impl` 2.0.21 声明 `rust_version` 1.77），故本 crate 声明 `rust-version = "1.77"`（2026-11-16 复核；不得照抄兄弟仓）。
 
 `csv-core` 未声明 `rust_version`：它是 `csv` 的私有实现细节，无语义上的独立下界；
-`csv` 自身的 1.73 已支配该值，故按「保守取依赖链上的最大值」处理，不影响结论。
+`csv` 自身的 1.73 与 `thiserror` 2.0.21 的 1.77 中后者支配，故按「保守取依赖链上的最大值」处理，不影响结论。
 
 ## 已知缺口
 

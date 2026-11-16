@@ -2,7 +2,7 @@
 name = "eastmoneyx"
 version = "0.1.1"
 edition = "2021"
-rust-version = "1.73"
+rust-version = "1.77"
 description = "东方财富（EastMoney）宏观观测的离线源事实类型与 CSV 解析：仅脱敏宏观观测、fail-closed 授权判定与拒绝守卫"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/bytechainx/eastmoneyx"
