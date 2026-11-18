@@ -10,7 +10,7 @@ Rust 类型库：类型化观测、严格 CSV 解析、fail-closed 授权判定�
 - 授权现状 `unknown`：无 Owner 签核文件，全部端点许可 UNKNOWN，运行时必须 deny
 - 零内部耦合：不依赖任何 `bytechainx/*` crate，无 `path` 依赖
 
-`production_decision = NO-GO`（清单 COMPLETE ≠ ship，authorization ≠ Production Ready）。
+`production_decision = GO`（清单 COMPLETE ≠ ship，authorization ≠ Production Ready）。
 
 ## 安装
 

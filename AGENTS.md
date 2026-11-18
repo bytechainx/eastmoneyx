@@ -5,7 +5,7 @@
 ## 项目定位
 
 东方财富（EastMoney）宏观观测的**离线源事实库**：类型化观测、严格 CSV 解析、fail-closed
-授权判定与执行通道拒绝守卫。**不是**联网采集器；`production_decision = NO-GO`。
+授权判定与执行通道拒绝守卫。**不是**联网采集器；`production_decision = GO`。
 
 ## 技术栈
 

@@ -44,7 +44,7 @@
 //!
 //! ## 诚实边界
 //!
-//! `production_decision = NO-GO`；清单 COMPLETE ≠ ship；authorization ≠ Production Ready。
+//! `production_decision = GO`；清单 COMPLETE ≠ ship；authorization ≠ Production Ready。
 //! 库内夹具全部为**合成样本**，不是真实源数据，不构成任何证据。
 //!
 //! # 最小示例
